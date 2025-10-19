@@ -1,0 +1,12 @@
+{
+	"nodes":[
+		{"id":"06b2dc7b778aff75","x":-300,"y":-280,"width":336,"height":60,"type":"text","text":"# folder structure \n"},
+		{"id":"dbca8bb03bad94af","x":-480,"y":283,"width":588,"height":691,"type":"text","text":"backend/\n├── movie_api/                     # Django project folder\n│   ├── __init__.py\n│   ├── settings.py\n│   ├── urls.py\n│   ├── wsgi.py\n│   └── asgi.py\n│\n├── recommender/                   # Django app\n│   ├── __init__.py\n│   ├── admin.py\n│   ├── apps.py\n│   ├── models.py                  # optional, if you store users/ratings\n│   ├── urls.py\n│   ├── views.py                   # API endpoints\n│   ├── serializers.py             # (if using DRF)\n│   ├── recommender_model/\n│   │   ├── __init__.py\n│   │   ├── load_model.py          # Loads model.pkl at startup\n│   │   └── recommender.py         # Uses get_recommendations()\n│   ├── tests/\n│   │   └── test_api.py\n│   └── static/\n│\n├── manage.py\n└── requirements.txt\n"},
+		{"id":"72853f12f4bb4b3e","x":-321,"y":-140,"width":379,"height":184,"type":"text","text":"movie-recommender/\n├── backend/          ← Django project (API)\n├── frontend/         ← Next.js project (UI)\n├── model/            ← Data + recommender model (Python)\n└── README.md\n"},
+		{"id":"62567d1edd2dd430","x":200,"y":44,"width":534,"height":766,"type":"text","text":"model/\n├── data/\n│   ├── raw/\n│   │   ├── movies.csv\n│   │   ├── links.csv\n│   │   ├── tmdb_5000_movies.csv\n│   │   └── tmdb_5000_credits.csv\n│   ├── processed/\n│   │   └── merged_movies.csv\n│   └── README.md\n│\n├── notebooks/\n│   └── model_building.ipynb      # Build + test recommender\n│\n├── recommender/\n│   ├── __init__.py\n│   ├── data_loader.py            # Load + clean data\n│   ├── model_builder.py          # TF-IDF / cosine similarity\n│   ├── recommender.py            # get_recommendations(title)\n│   └── utils.py\n│\n├── tests/\n│   └── test_recommender.py\n│\n├── model.pkl                     # Saved trained model\n└── requirements.txt\n"}
+	],
+	"edges":[
+		{"id":"24b77375c6af777d","fromNode":"72853f12f4bb4b3e","fromSide":"right","toNode":"62567d1edd2dd430","toSide":"top"},
+		{"id":"4964657937db3dc1","fromNode":"72853f12f4bb4b3e","fromSide":"bottom","toNode":"dbca8bb03bad94af","toSide":"top"}
+	]
+}

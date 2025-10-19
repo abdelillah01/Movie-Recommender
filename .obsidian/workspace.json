@@ -1,0 +1,190 @@
+{
+  "main": {
+    "id": "98558d6a518536e9",
+    "type": "split",
+    "children": [
+      {
+        "id": "732042638486f843",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "219b156cae87bafb",
+            "type": "leaf",
+            "state": {
+              "type": "canvas",
+              "state": {
+                "file": "MAP.canvas",
+                "viewState": {
+                  "x": 403.8655952815832,
+                  "y": 418.00999056880187,
+                  "zoom": -0.7186309736669063
+                }
+              },
+              "icon": "lucide-layout-dashboard",
+              "title": "MAP"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "005517684d6cd766",
+    "type": "split",
+    "children": [
+      {
+        "id": "76679cedada4f5e0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "57c6333d1e9d7f1b",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "da67c45b05e700cc",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "df3a491cd0208ed1",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "6ad295ce840a919d",
+    "type": "split",
+    "children": [
+      {
+        "id": "3f83475a9b454fdf",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0d8b1af1d50ecfe4",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "MAP.canvas",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for MAP"
+            }
+          },
+          {
+            "id": "29bcaa393dbd926d",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "MAP.canvas",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from MAP"
+            }
+          },
+          {
+            "id": "409732e41b3558bf",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "84c0cd12dc839a49",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "MAP.canvas",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of MAP"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "219b156cae87bafb",
+  "lastOpenFiles": [
+    "ML-model/model.pkl",
+    "ML-model/recommender/__pycache__/recommender.cpython-313.pyc",
+    "ML-model/recommender/__pycache__/data_loader.cpython-313.pyc",
+    "ML-model/recommender/__pycache__/model_builder.cpython-313.pyc",
+    "ML-model/recommender/__pycache__",
+    "ML-model/notebooks/model_buillding.py",
+    "ML-model/notebooks/model_buillding.ipynb",
+    "ML-model/recommender/recommender.py",
+    "ML-model/recommender/model_builder.py",
+    "ML-model/recommender/data_loader.py",
+    "Untitled.base",
+    "MAP.canvas"
+  ]
+}
