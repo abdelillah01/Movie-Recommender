@@ -17,7 +17,7 @@ save_model((tfidf, matrix, df), "ML-model/model.pkl")
 
 # 4️⃣ Test recommendation
  # sample_title = "The Dark Knight"
-sample_title = df["title"].iloc[10]  # use first movie automatically
+sample_title = df["title"].iloc[50]  # use first movie automatically
 print("🎬 Testing recommendation for:", sample_title)
 
 # Get movie index
