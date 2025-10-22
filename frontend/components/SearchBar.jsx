@@ -1,28 +1,38 @@
+"use client";
+
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 export default function SearchBar({ onSearch }) {
   const [title, setTitle] = useState("");
 
-  const handleSubmit = (e) => {
+  const submit = (e) => {
     e.preventDefault();
-    if (title.trim()) onSearch(title);
+    if (!title.trim()) return;
+    onSearch(title.trim());
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-3">
+    <motion.form
+      onSubmit={submit}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35 }}
+      className="flex items-center gap-3 p-3 rounded-xl glass border border-slate-200/60 dark:border-slate-700 max-w-3xl mx-auto"
+    >
       <input
-        type="text"
-        placeholder="Enter a movie title..."
+        className="flex-1 bg-transparent px-4 py-3 rounded-lg focus:outline-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400"
+        placeholder="Enter movie title (e.g. Toy Story)"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        className="px-4 py-2 border rounded-lg w-72 focus:ring-2 focus:ring-blue-500 outline-none"
+        aria-label="Movie title"
       />
       <button
         type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+        className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-4 py-2 rounded-lg shadow"
       >
         Recommend
       </button>
-    </form>
+    </motion.form>
   );
 }

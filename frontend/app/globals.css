@@ -1,42 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fonts (optional fallback) */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ui-bg: theme(colors.white);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Simple utility for glass effect */
+.glass {
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);  
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+.dark .glass {
+  background: rgba(17,24,39,0.45);
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Body spacing */
+html, body, #__next {
+  height: 100%;
 }
 
+/* Smooth transitions */
 * {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+  transition: color 200ms ease, background-color 200ms ease, box-shadow 180ms ease, transform 120ms ease;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+/* skeleton animation */
+@keyframes shimmer {
+  0% { background-position: -300px 0; }
+  100% { background-position: 300px 0; }
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 100%);
+  background-size: 600px 100%;
+  animation: shimmer 1.2s linear infinite;
 }
+

@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import SearchBar from "../components/SearchBar";
 import MovieCard from "../components/MovieCard";
+import LoadingSkeleton from "../components/LoadingSkeleton";
+import DarkToggle from "../components/DarkToggle";
 import recommendMovies from "./api/recommend";
 
 export default function Home() {
@@ -11,41 +14,90 @@ export default function Home() {
   const [error, setError] = useState("");
 
   const handleSearch = async (title) => {
-    setLoading(true);
     setError("");
     setMovies([]);
-
+    setLoading(true);
     try {
       const results = await recommendMovies(title);
-      console.log("🎥 Recommendations received:", results);
-      setMovies(results || []);
+      // backend returns array of strings, but we normalize to array of objects
+      const normalized = (results || []).map((r) =>
+        typeof r === "string" ? { text: r } : r
+      );
+      setMovies(normalized);
     } catch (err) {
-      console.error("❌ Fetch failed:", err);
-      setError("Failed to fetch recommendations. Please try again.");
+      console.error("Search failed:", err);
+      setError("Could not fetch recommendations. Try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-8 bg-gray-50">
-      <h1 className="text-4xl font-bold mb-6 text-blue-600">🎬 Movie Recommender</h1>
-      <SearchBar onSearch={handleSearch} />
+    <main className="min-h-screen flex flex-col items-center px-6 py-12">
+      <div className="w-full max-w-5xl">
+        <header className="flex items-center justify-between mb-8">
+          <div>
+            <motion.h1
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-800 dark:text-slate-100"
+            >
+              Movie Recommender
+            </motion.h1>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-300">
+              Clean modern UI — search a movie to get recommendations.
+            </p>
+          </div>
 
-      {loading && <p className="mt-4 text-gray-600">Loading recommendations...</p>}
-      {error && <p className="mt-4 text-red-500">{error}</p>}
+          <div className="flex items-center gap-3">
+            <DarkToggle />
+          </div>
+        </header>
 
-      {movies.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
-          {movies.map((movie, index) => (
-            <MovieCard key={index} title={movie} />
-          ))}
+        <div className="mb-8">
+          <SearchBar onSearch={handleSearch} />
         </div>
-      )}
 
-      {!loading && movies.length === 0 && !error && (
-        <p className="mt-6 text-gray-500">Enter a movie title to get recommendations 🎞️</p>
-      )}
+        {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <LoadingSkeleton />
+            <LoadingSkeleton />
+            <LoadingSkeleton />
+            <LoadingSkeleton />
+          </div>
+        )}
+
+        {!loading && error && (
+          <div className="mt-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-100 dark:border-red-800 text-red-700 dark:text-red-200">
+            {error}
+          </div>
+        )}
+
+        <AnimatePresence>
+          {!loading && movies.length === 0 && !error && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mt-6 text-center text-slate-500 dark:text-slate-300"
+            >
+              Try “Toy Story” or another movie — recommendations will appear here.
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {!loading && movies.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            layout
+            className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+          >
+            {movies.map((m, idx) => (
+              <MovieCard key={idx} title={m.text || m.title || String(m)} />
+            ))}
+          </motion.div>
+        )}
+      </div>
     </main>
   );
 }
