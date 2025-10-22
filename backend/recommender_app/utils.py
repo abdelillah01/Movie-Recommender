@@ -1,31 +1,41 @@
-import pickle
 from pathlib import Path
-from sklearn.metrics.pairwise import linear_kernel
+import pickle
+from sklearn.metrics.pairwise import cosine_similarity
+import pandas as pd
+from difflib import get_close_matches
 
-# Load the trained model (only once at startup)
-MODEL_PATH = Path(__file__).resolve().parent.parent.parent / "ML-model" / "model.pkl"
-print(f"🔹 Loading model from {MODEL_PATH}")
+# BASE_DIR points to backend/
+BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Go up one more directory to reach MOVIE-RECOMMENDER/
+PROJECT_ROOT = BASE_DIR.parent
+
+# Define model path
+MODEL_PATH = PROJECT_ROOT / "ML-model" / "model.pkl"
+
+# Load the pickled data (vectorizer, matrix, and dataframe)
 with open(MODEL_PATH, "rb") as f:
-    tfidf, matrix, df = pickle.load(f)
+    model_data = pickle.load(f)
 
-def get_recommendations(title, top_n=5):
-    """
-    Recommend top_n movies similar to the given title.
-    """
-    # Find the movie
-    matches = df[df["title"].str.contains(title, case=False, na=False)]
-    if matches.empty:
-        return {"error": f"No movie found for '{title}'"}
-    idx = matches.index[0]
-    profile = matrix[idx]
+# Unpack correctly (your pickle contains 3 elements)
+tfidf_vectorizer, tfidf_matrix, movies_df = model_data
 
-    # Compute similarity
-    if hasattr(profile, "toarray"):
-        profile = profile.toarray()
-    cosine_sim = linear_kernel(profile, matrix).flatten()
-    sim_indices = cosine_sim.argsort()[::-1][1:top_n+1]
+# Build a lookup for movie titles
+title_to_index = {title.lower(): i for i, title in enumerate(movies_df["title"])}
 
-    # Return movie titles
-    recommendations = df.iloc[sim_indices]["title"].tolist()
-    return {"input": df.iloc[idx]["title"], "recommendations": recommendations}
+def recommend_movies(movie_title, top_n=10):
+    movie_title = movie_title.lower()
+    # Find the closest match in title_to_index
+    matches = get_close_matches(movie_title, title_to_index.keys(), n=1, cutoff=0.5)
+    if not matches:
+        raise ValueError(f"Movie '{movie_title}' not found in dataset")
+
+    best_match = matches[0]
+    idx = title_to_index[best_match]
+
+    cosine_similarities = cosine_similarity(tfidf_matrix[idx], tfidf_matrix).flatten()
+    similar_indices = cosine_similarities.argsort()[-top_n-1:-1][::-1]
+    return movies_df.iloc[similar_indices]["title"].tolist()
+
+
+

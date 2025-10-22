@@ -1,13 +1,24 @@
 from django.http import JsonResponse
-from .utils import get_recommendations
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .utils import recommend_movies
 
+@csrf_exempt
 def recommend_view(request):
-    title = request.GET.get("title", "")
-    if not title:
-        return JsonResponse({"error": "Missing 'title' parameter"}, status=400)
+    if request.method == "POST":
+        try:
+            body = json.loads(request.body)
+            movie_title = body.get("title", "")
 
-    result = get_recommendations(title)
-    return JsonResponse(result)
+            if not movie_title:
+                return JsonResponse({"error": "Missing 'title' field"}, status=400)
 
+            recommendations = recommend_movies(movie_title)
+            return JsonResponse({"recommendations": recommendations})
 
-# Create your views here.
+        except ValueError as e:
+            return JsonResponse({"error": str(e)}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": f"Unexpected error: {str(e)}"}, status=500)
+
+    return JsonResponse({"error": "Only POST method allowed"}, status=405)
