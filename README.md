@@ -285,7 +285,7 @@ Invoke-WebRequest -Uri "http://127.0.0.1:8000/api/recommend/" `
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/movie-recommender.git
+   git clone https://github.com/abdelillah01/Movie-Recommender
    cd movie-recommender/backend
    ```
 
