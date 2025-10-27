@@ -11,7 +11,7 @@ This project recommends movies similar to a given title using TF-IDF vectorizati
 *   **Machine Learning Model (Offline)** – Builds the similarity model from movie data.
 *   **Django Backend API (Online)** – Serves movie recommendations via an HTTP endpoint.
 *   **Next.js Frontend (User Interface)**  - allows users to interact with the recommendation system visually.                     
-
+<img width="1669" height="870" alt="Screenshot 2025-10-27 165803" src="https://github.com/user-attachments/assets/8e83b751-97fb-4925-bda7-08b7c42b8a64" />
 
 ## Table of Contents
 
