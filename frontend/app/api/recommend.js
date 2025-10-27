@@ -1,23 +1,34 @@
-import axios from "axios";
-
-/**
- * recommendMovies(title)
- * Uses Axios to POST to your Django backend.
- * Returns an array of recommendations (strings or objects).
- */
 export default async function recommendMovies(title) {
   if (!title) return [];
+
   try {
-    console.log("[frontend] sending:", title);
-    const res = await axios.post("http://127.0.0.1:8000/api/recommend/", { title }, {
-      headers: { "Content-Type": "application/json" },
-      timeout: 10000,
+    const response = await fetch("http://127.0.0.1:8000/api/recommend/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title }),
     });
-    console.log("[frontend] response:", res.data);
-    return res.data.recommendations || [];
+
+    if (!response.ok) {
+      const text = await response.text();
+      console.error("Backend error:", response.status, text);
+      throw new Error(`Backend returned ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Backend response:", data);
+
+    // Ensure valid shape
+    if (Array.isArray(data.recommendations)) {
+      return data.recommendations;
+    } else if (data.recommendations && typeof data.recommendations === "object") {
+      return Object.values(data.recommendations);
+    } else {
+      throw new Error("Invalid data format from backend");
+    }
   } catch (err) {
-    // Rethrow so page.jsx can show an error message
-    console.error("API call failed:", err);
+    console.error("Fetch failed:", err);
     throw err;
   }
 }

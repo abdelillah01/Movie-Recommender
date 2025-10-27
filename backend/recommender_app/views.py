@@ -14,7 +14,7 @@ def recommend_view(request):
                 return JsonResponse({"error": "Missing 'title' field"}, status=400)
 
             recommendations = recommend_movies(movie_title)
-            return JsonResponse({"recommendations": recommendations})
+            return JsonResponse({"recommendations": recommendations}, safe=False)
 
         except ValueError as e:
             return JsonResponse({"error": str(e)}, status=404)

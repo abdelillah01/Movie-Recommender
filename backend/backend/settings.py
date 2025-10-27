@@ -10,6 +10,16 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+TMDB_API_KEY = os.getenv("TMDB_API_KEY")
+
+
+
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
