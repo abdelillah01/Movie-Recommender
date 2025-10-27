@@ -2,7 +2,7 @@ import "./globals.css";
 
 export const metadata = {
   title: "Movie Recommender",
-  description: "Clean modern UI for a Django movie recommender",
+  description: "Tired of always asking 'What movie should I watch?' Get clean, cinematic recommendations with a sleek, modern feel.",
 };
 
 export default function RootLayout({ children }) {

@@ -1,42 +1,128 @@
+/* Tailwind layers */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Fonts (optional fallback) */
+/* Design tokens and defaults */
 :root {
-  --ui-bg: theme(colors.white);
+  --ui-bg: #0B0F17; /* Deep blue-black base */
+  --ring-soft: rgba(99,102,241,0.15); /* Indigo ring */
+  --border-soft: rgba(255,255,255,0.10); /* Hairline border */
+  --surface: rgba(255,255,255,0.06); /* Frosted surface tint */
 }
 
-/* Simple utility for glass effect */
-.glass {
-  background: rgba(255,255,255,0.6);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);  
+/* Base resets and quality-of-life */
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body, #__next, #root {
+    min-height: 100%;
+    background: var(--ui-bg);
+  }
+
+  ::selection {
+    background: rgba(99,102,241,0.3);
+    color: white;
+  }
 }
 
-.dark .glass {
-  background: rgba(17,24,39,0.45);
-}
-
-/* Body spacing */
-html, body, #__next {
-  height: 100%;
-}
-
-/* Smooth transitions */
+/* Motion and transitions (do not globally transition transform) */
 * {
-  transition: color 200ms ease, background-color 200ms ease, box-shadow 180ms ease, transform 120ms ease;
+  transition:
+    color 200ms ease,
+    background-color 200ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    opacity 180ms ease;
 }
 
-/* skeleton animation */
+/* Respect reduced motion for long-running effects */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* Skeleton shimmer */
 @keyframes shimmer {
   0% { background-position: -300px 0; }
   100% { background-position: 300px 0; }
 }
-
 .skeleton {
-  background: linear-gradient(90deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.06) 0%,
+    rgba(255,255,255,0.12) 50%,
+    rgba(255,255,255,0.06) 100%
+  );
   background-size: 600px 100%;
   animation: shimmer 1.2s linear infinite;
 }
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+}
 
+/* Cinematic ambient background */
+.bg-cinema {
+  background:
+    radial-gradient(800px 400px at 20% -10%, rgba(99,102,241,0.10), transparent 70%),
+    radial-gradient(700px 360px at 85% 0%, rgba(56,189,248,0.08), transparent 70%),
+    linear-gradient(180deg, #0B0F17 0%, #0F172A 35%, #0B0F17 100%);
+}
+
+/* Very soft edge vignette (with mask fallback) */
+.vignette {
+  pointer-events: none;
+  background: radial-gradient(1200px 600px at 50% 110%, rgba(0,0,0,0.6), transparent 60%);
+  /* Mask for softer center fade when supported */
+  -webkit-mask-image: radial-gradient(75% 60% at 50% 45%, black 60%, transparent 100%);
+  mask-image: radial-gradient(75% 60% at 50% 45%, black 60%, transparent 100%);
+}
+
+/* Ultra-light film grain */
+.grain {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255,255,255,0.03) 0px,
+    rgba(255,255,255,0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  mix-blend-mode: overlay;
+}
+
+/* Unified frosted-glass surface (dark-leaning by default) */
+.glass {
+  background-color: var(--surface);
+  border: 1px solid var(--border-soft);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+}
+
+/* Optional lighter surface for light contexts, if ever needed */
+.glass-light {
+  background-color: rgba(255,255,255,0.4);
+  border: 1px solid rgba(0,0,0,0.06);
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+}
+
+/* Soft, accessible focus ring */
+.focus-ring,
+:where(button, a, input, textarea, select):focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.07),
+    0 0 0 6px var(--ring-soft);
+}
+
+/* Accent glow for interactive elements */
+.glow-indigo {
+  box-shadow: 0 0 24px rgba(99,102,241,0.25);
+}

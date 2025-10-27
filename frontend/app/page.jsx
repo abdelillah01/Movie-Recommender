@@ -7,6 +7,12 @@ import MovieCard from "../components/MovieCard";
 import LoadingSkeleton from "../components/LoadingSkeleton";
 import DarkToggle from "../components/DarkToggle";
 import recommendMovies from "./api/recommend";
+import BackgroundFX from "../components/BackgroundFX";
+
+const fadeIn = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
+};
 
 export default function Home() {
   const [movies, setMovies] = useState([]);
@@ -21,7 +27,6 @@ export default function Home() {
     try {
       const results = await recommendMovies(title);
 
-      // Normalize: backend should return [{ title, poster, release_date }, ...]
       const normalized = Array.isArray(results)
         ? results.map((r) => ({
             title: r.title || r.text || String(r),
@@ -40,22 +45,22 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center px-6 py-12">
-      <div className="w-full max-w-5xl">
+    <main className="relative min-h-screen overflow-hidden bg-[#0B0F17] text-slate-100">
+      <BackgroundFX />
+
+      <div className="relative mx-auto w-full max-w-6xl px-6 py-12">
         {/* Header */}
         <header className="flex items-center justify-between mb-8">
-          <div>
-            <motion.h1
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-800 dark:text-slate-100"
-            >
-              Movie Recommender
-            </motion.h1>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-300">
-              Clean modern UI — search a movie to get recommendations.
+          <motion.div initial="hidden" animate="show" variants={fadeIn}>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-slate-100 via-slate-100 to-slate-300">
+                Movie Recommender
+              </span>
+            </h1>
+            <p className="mt-1 text-sm text-slate-400">
+              Tired of always asking 'What movie should I watch?' Get clean, cinematic recommendations with a sleek, modern feel.
             </p>
-          </div>
+          </motion.div>
 
           <div className="flex items-center gap-3">
             <DarkToggle />
@@ -63,24 +68,33 @@ export default function Home() {
         </header>
 
         {/* Search Bar */}
-        <div className="mb-8">
+        <motion.div initial="hidden" animate="show" variants={fadeIn} className="mb-8">
           <SearchBar onSearch={handleSearch} />
-        </div>
+        </motion.div>
 
         {/* Loading Skeletons */}
         {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+          >
             {[...Array(8)].map((_, i) => (
               <LoadingSkeleton key={i} />
             ))}
-          </div>
+          </motion.div>
         )}
 
         {/* Error Message */}
         {!loading && error && (
-          <div className="mt-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-100 dark:border-red-800 text-red-700 dark:text-red-200">
+          <motion.div
+            initial="hidden"
+            animate="show"
+            variants={fadeIn}
+            className="mt-6 p-4 rounded-xl glass text-red-200 border-red-300/10"
+          >
             {error}
-          </div>
+          </motion.div>
         )}
 
         {/* Empty State */}
@@ -89,7 +103,7 @@ export default function Home() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="mt-6 text-center text-slate-500 dark:text-slate-300"
+              className="mt-6 text-center text-slate-400"
             >
               Try “Toy Story” or another movie — recommendations will appear here.
             </motion.div>
