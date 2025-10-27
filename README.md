@@ -501,7 +501,6 @@ Currently I'm working to improve this project with the following enhancements:
 - [ ] **Rating System** - Implement movie ratings to improve recommendation quality
 - [ ] **Advanced Filtering** - Add filters by genre, year, or rating
 - [ ] **Hybrid Recommendations** - Combine content-based and collaborative filtering
-- [ ] **Movie Details** - Display additional movie information (posters, descriptions, cast)
 - [ ] **Dockerization** - Containerize the application for easier deployment
 - [ ] **Performance Optimization** - Improve recommendation algorithm speed and accuracy
 
