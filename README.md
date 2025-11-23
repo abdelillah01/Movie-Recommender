@@ -331,84 +331,6 @@ The frontend is built with Next.js 14 (App Router) and communicates with the Dja
    npm install axios
    ```
 
-## 5. Example Components
-
-### `app/page.tsx`
-
-```tsx
-"use client";
-
-import { useState } from "react";
-import axios from "axios";
-
-export default function Home() {
-  const [title, setTitle] = useState("");
-  const [recommendations, setRecommendations] = useState<string[]>([]);
-  const [error, setError] = useState("");
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setRecommendations([]);
-
-    if (!title.trim()) {
-      setError("Please enter a movie title.");
-      return;
-    }
-
-    try {
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/recommend/`,
-        { title }
-      );
-      setRecommendations(res.data.recommendations || []);
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Something went wrong.");
-    }
-  };
-
-  return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white p-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">
-        🎬 Movie Recommender System
-      </h1>
-
-      <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter a movie title..."
-          className="px-4 py-2 rounded-lg text-black w-64"
-        />
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg"
-        >
-          Recommend
-        </button>
-      </form>
-
-      {error && <p className="text-red-400 mb-4">{error}</p>}
-
-      {recommendations.length > 0 && (
-        <div className="bg-gray-800 p-4 rounded-xl w-80 shadow-md">
-          <h2 className="text-xl font-semibold mb-2 text-center">
-            Recommended Movies:
-          </h2>
-          <ul className="space-y-1">
-            {recommendations.map((movie, i) => (
-              <li key={i} className="border-b border-gray-700 py-1">
-                {movie}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </main>
-  );
-}
-```
 
 ## 6. Running the Frontend
 
@@ -420,7 +342,7 @@ npm run dev
 
 The app will run on:
 
-👉 **http://localhost:3000**
+ **http://localhost:3000**
 
 Make sure your Django backend is running on `http://127.0.0.1:8000`
 
@@ -488,10 +410,10 @@ A clean list of recommended movies displayed in the browser.
 
 ## 10. Author
 
-**Mohamed Abdelilah Ouraou**
+**abdelillah01**
 
 **Technologies:** Python, Django, scikit-learn, Next.js  
-**Model Type:** Content-Based Filtering using TF-IDF and Cosine Similarity
+**Model Type:** Content Based Filtering using TF-IDF and Cosine Similarity
 
 ## Future Improvements
 
