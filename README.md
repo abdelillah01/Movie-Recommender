@@ -21,7 +21,6 @@ This project recommends movies similar to a given title using TF-IDF vectorizati
 - [2. Django Backend API](#2-django-backend-api)
 - [3. Next.js Frontend](#3-nextjs-frontend)
 - [4. API Usage](#4-api-usage)
-- [5. Example Components](#5-example-components)
 - [6. Running the Frontend](#6-running-the-frontend)
 - [7. Enabling CORS in Django](#7-enabling-cors-in-django)
 - [8. Example Interaction](#8-example-interaction)
