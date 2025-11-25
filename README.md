@@ -382,7 +382,7 @@ Toy Story
 {
   "recommendations": [
     "Toy Story 2 (1999)",
-    "Toy Story 3 (2010)",
+    "Toy Story 4 (2010)",
     "Cars (2006)",
     "Finding Nemo (2003)",
     "Monsters, Inc. (2001)"
