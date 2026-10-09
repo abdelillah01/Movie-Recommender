@@ -5,6 +5,7 @@ import pandas as pd
 from difflib import get_close_matches
 import requests
 import re
+from django.conf import settings
 
 # --- Base setup ---
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,7 +20,7 @@ tfidf_vectorizer, tfidf_matrix, movies_df = model_data
 title_to_index = {title.lower(): i for i, title in enumerate(movies_df["title"])}
 
 # --- TMDB Setup ---
-TMDB_API_KEY = "3e7866a6f24b5772f1a04d521556ff4c"
+TMDB_API_KEY = settings.TMDB_API_KEY
 TMDB_BASE_URL = "https://api.themoviedb.org/3/search/movie"
 TMDB_IMAGE_URL = "https://image.tmdb.org/t/p/w500"
 
