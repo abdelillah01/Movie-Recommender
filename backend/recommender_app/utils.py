@@ -54,17 +54,21 @@ def fetch_poster(title: str):
 def recommend_movies(movie_title, top_n=10):
     (tfidf_vectorizer, tfidf_matrix, movies_df), title_to_index = _load_model()
 
-    movie_title = movie_title.lower()
-    matches = get_close_matches(movie_title, title_to_index.keys(), n=1, cutoff=0.5)
+    query_lower = movie_title.lower()
+    matches = get_close_matches(query_lower, title_to_index.keys(), n=1, cutoff=0.5)
     if not matches:
         raise ValueError(f"Movie '{movie_title}' not found in dataset")
 
-    idx = title_to_index[matches[0]]
+    matched_key = matches[0]
+    idx = title_to_index[matched_key]
+    matched_title = movies_df.iloc[idx]["title"]
+
     cosine_similarities = cosine_similarity(tfidf_matrix[idx], tfidf_matrix).flatten()
     similar_indices = cosine_similarities.argsort()[-top_n - 1:-1][::-1]
     similar_titles = movies_df.iloc[similar_indices]["title"].tolist()
 
-    return [
+    recommendations = [
         {"title": title, "poster": fetch_poster(title)}
         for title in similar_titles
     ]
+    return matched_title, recommendations

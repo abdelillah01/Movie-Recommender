@@ -33,18 +33,22 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
+  const [matched, setMatched] = useState(null);
 
   const handleSearch = async (title) => {
     setError("");
     setMovies([]);
     setQuery(title);
+    setMatched(null);
     setLoading(true);
 
     try {
-      const results = await recommendMovies(title);
-      const normalized = Array.isArray(results)
-        ? results.map((r) => ({ title: r.title || String(r), poster: r.poster || "" }))
-        : [];
+      const { matched: m, recommendations } = await recommendMovies(title);
+      setMatched(m);
+      const normalized = recommendations.map((r) => ({
+        title: r.title || String(r),
+        poster: r.poster || "",
+      }));
       setMovies(normalized);
     } catch (err) {
       console.error("Search failed:", err);
@@ -111,18 +115,25 @@ export default function Home() {
         {/* Result header */}
         <AnimatePresence>
           {hasResults && (
-            <motion.p
+            <motion.div
               key="result-header"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="mb-5 text-sm text-slate-400"
+              className="mb-5"
             >
-              <span className="text-slate-500">Because you watched</span>{" "}
-              <span className="text-slate-200 font-medium">{query}</span>
-              <span className="ml-2 text-slate-600">· {movies.length} picks</span>
-            </motion.p>
+              <p className="text-sm text-slate-400">
+                <span className="text-slate-500">Because you watched</span>{" "}
+                <span className="text-slate-200 font-medium">{matched || query}</span>
+                <span className="ml-2 text-slate-600">· {movies.length} picks</span>
+              </p>
+              {matched && matched.toLowerCase() !== query.toLowerCase() && (
+                <p className="mt-1 text-xs text-slate-500">
+                  Matched &ldquo;{matched}&rdquo; for your search
+                </p>
+              )}
+            </motion.div>
           )}
         </AnimatePresence>
 

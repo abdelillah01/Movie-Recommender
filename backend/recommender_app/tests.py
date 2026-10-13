@@ -64,20 +64,25 @@ class RecommendMoviesTest(TestCase):
 
     def test_returns_n_results(self):
         from recommender_app.utils import recommend_movies
-        results = recommend_movies("Toy Story (1995)", top_n=2)
+        _, results = recommend_movies("Toy Story (1995)", top_n=2)
         self.assertEqual(len(results), 2)
 
     def test_results_have_title_and_poster_keys(self):
         from recommender_app.utils import recommend_movies
-        results = recommend_movies("Toy Story (1995)", top_n=1)
+        _, results = recommend_movies("Toy Story (1995)", top_n=1)
         self.assertIn("title", results[0])
         self.assertIn("poster", results[0])
 
     def test_excludes_seed_movie(self):
         from recommender_app.utils import recommend_movies
-        results = recommend_movies("Toy Story (1995)", top_n=4)
+        _, results = recommend_movies("Toy Story (1995)", top_n=4)
         titles = [r["title"] for r in results]
         self.assertNotIn("Toy Story (1995)", titles)
+
+    def test_matched_title_returned(self):
+        from recommender_app.utils import recommend_movies
+        matched, _ = recommend_movies("Toy Story (1995)", top_n=1)
+        self.assertEqual(matched, "Toy Story (1995)")
 
     def test_unknown_title_raises_value_error(self):
         from recommender_app.utils import recommend_movies
@@ -114,9 +119,10 @@ class FuzzyMatchTest(TestCase):
     def test_typo_resolves_to_correct_movie(self):
         from recommender_app.utils import recommend_movies
         # "toy stroy" is close enough to "toy story (1995)" at cutoff=0.5
-        results = recommend_movies("toy stroy", top_n=2)
+        matched, results = recommend_movies("toy stroy", top_n=2)
         self.assertIsInstance(results, list)
         self.assertGreater(len(results), 0)
+        self.assertIn("toy story", matched.lower())
 
 
 # ---------------------------------------------------------------------------
@@ -128,7 +134,7 @@ class RecommendViewTest(TestCase):
         self.client = Client()
         patcher_fn = patch(
             "recommender_app.views.recommend_movies",
-            return_value=[{"title": "Toy Story 2 (1999)", "poster": None}],
+            return_value=("Toy Story (1995)", [{"title": "Toy Story 2 (1999)", "poster": None}]),
         )
         self.mock_fn = patcher_fn.start()
         self.addCleanup(patcher_fn.stop)

@@ -16,8 +16,11 @@ def recommend_view(request):
             if not movie_title:
                 return JsonResponse({"error": "Missing 'title' field"}, status=400)
 
-            recommendations = recommend_movies(movie_title)
-            return JsonResponse({"recommendations": recommendations}, safe=False)
+            matched_title, recommendations = recommend_movies(movie_title)
+            payload = {"matched": matched_title, "recommendations": recommendations}
+            if matched_title.lower() != movie_title.strip().lower():
+                payload["query"] = movie_title.strip()
+            return JsonResponse(payload, safe=False)
 
         except ValueError as e:
             return JsonResponse({"error": str(e)}, status=404)
