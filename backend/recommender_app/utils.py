@@ -11,18 +11,22 @@ from sklearn.metrics.pairwise import cosine_similarity
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = BASE_DIR.parent
 MODEL_PATH = PROJECT_ROOT / "ML-model" / "model.pkl"
+NEIGHBOR_TABLE_PATH = PROJECT_ROOT / "ML-model" / "neighbor_table.npy"
 
 _model_data = None
 _title_to_index = None
+_neighbor_table = None  # shape (n_movies, 50) int32, None if file absent
 
 
 def _load_model():
-    global _model_data, _title_to_index
+    global _model_data, _title_to_index, _neighbor_table
     if _model_data is None:
         with open(MODEL_PATH, "rb") as f:
             _model_data = pickle.load(f)
         _, _, movies_df = _model_data
         _title_to_index = {title.lower(): i for i, title in enumerate(movies_df["title"])}
+        if NEIGHBOR_TABLE_PATH.exists():
+            _neighbor_table = np.load(NEIGHBOR_TABLE_PATH)
     return _model_data, _title_to_index
 
 
@@ -67,17 +71,28 @@ def recommend_movies(movie_title, top_n=10, rerank=True):
     idx = title_to_index[matched_key]
     matched_title = movies_df.iloc[idx]["title"]
 
-    cosine_similarities = cosine_similarity(tfidf_matrix[idx], tfidf_matrix).flatten()
-
-    if rerank and "vote_average" in movies_df.columns:
-        ratings = movies_df["vote_average"].fillna(0).to_numpy().astype(float)
-        scores = cosine_similarities * np.power(np.maximum(ratings, 0), RERANK_BETA)
+    if _neighbor_table is not None:
+        # fast path: precomputed neighbor lookup (top-50), then re-rank within that pool
+        candidate_indices = _neighbor_table[idx]  # top-50 neighbor indices
+        if rerank and "vote_average" in movies_df.columns:
+            sims = cosine_similarity(tfidf_matrix[idx], tfidf_matrix[candidate_indices]).flatten()
+            ratings = movies_df.iloc[candidate_indices]["vote_average"].fillna(0).to_numpy()
+            scores = sims * np.power(np.maximum(ratings, 0), RERANK_BETA)
+            order = scores.argsort()[-top_n:][::-1]
+            similar_indices = candidate_indices[order]
+        else:
+            similar_indices = candidate_indices[:top_n]
     else:
-        scores = cosine_similarities
+        # fallback: full cosine scan
+        cosine_similarities = cosine_similarity(tfidf_matrix[idx], tfidf_matrix).flatten()
+        if rerank and "vote_average" in movies_df.columns:
+            ratings = movies_df["vote_average"].fillna(0).to_numpy().astype(float)
+            scores = cosine_similarities * np.power(np.maximum(ratings, 0), RERANK_BETA)
+        else:
+            scores = cosine_similarities
+        scores[idx] = -1
+        similar_indices = scores.argsort()[-top_n:][::-1]
 
-    # exclude the seed movie itself
-    scores[idx] = -1
-    similar_indices = scores.argsort()[-top_n:][::-1]
     similar_titles = movies_df.iloc[similar_indices]["title"].tolist()
 
     recommendations = [
