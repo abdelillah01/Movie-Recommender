@@ -12,12 +12,12 @@ Execution checklist derived from [`ROADMAP.md`](ROADMAP.md). The roadmap explain
 
 | Phase | Focus | Est. | Done |
 | --- | --- | --- | --- |
-| 0 | Stop the bleeding | ~4.5h | 5 / 16 |
+| 0 | Stop the bleeding | ~4.5h | 14 / 16 |
 | 1 | Make it runnable | ~12h | 0 / 15 |
 | 2 | ML substance | ~18h | 0 / 18 |
 | 3 | Engineering substance | ~16h | 0 / 21 |
 | 4 | Presentation | ~8h | 0 / 11 |
-| — | **Total** | **~58h** | **5 / 81** |
+| — | **Total** | **~58h** | **14 / 81** |
 
 Plus 4 optional stretch items, excluded from the total.
 
@@ -36,8 +36,7 @@ Pure hygiene, no new functionality. The roadmap calls this tier "individually tr
   **Done when:** the old key returns 401 from TMDB and the app works with the new one.
   **Only you can do this** — it needs your TMDB login.
 
-- [ ] **P0-02** — Move Django `SECRET_KEY` to env. Generate a fresh one with `python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"`, read it via `os.getenv("SECRET_KEY")` in `backend/backend/settings.py:33`, add `SECRET_KEY=` to `backend/.env.example`. *(#2, 15 min)*
-  **Done when:** no secret literal remains in `settings.py` and `runserver` still starts.
+- [x] **P0-02** — Move Django `SECRET_KEY` to env. Read via `os.getenv("SECRET_KEY")` in `backend/backend/settings.py`; also moved `DEBUG` and `ALLOWED_HOSTS` to env. Added `SECRET_KEY=`, `DEBUG=`, `ALLOWED_HOSTS=` to `backend/.env.example`. *(#2)*
 
 - [x] **P0-03** — Remove the hardcoded TMDB key from `recommender_app/utils.py`; read `settings.TMDB_API_KEY` instead. *(#1)*
   Done in `c0aef92`. Verified: `utils.py:23` now reads `settings.TMDB_API_KEY`.
@@ -51,39 +50,30 @@ Pure hygiene, no new functionality. The roadmap calls this tier "individually tr
 - [x] **P0-06** — Add `backend/.env.example` so the required env vars are discoverable.
   Done. Extend it when you add `SECRET_KEY` (P0-02) and `DEBUG` (P1-05).
 
-- [ ] **P0-07** — Decide on git history and write the decision down. **Roadmap recommends: leave it.** Force-pushing a rewritten history for an already-revoked key is churn with no benefit. *(30 min)*
-  **Done when:** either history is purged with `git filter-repo`, or a one-line note in `ROADMAP.md` records the deliberate choice to leave it. A reviewer who finds the old key should be able to tell it was handled, not missed.
+- [x] **P0-07** — Decided to leave git history intact. Rationale recorded in `ROADMAP.md` (after the calibration block): old TMDB key is revoked; force-rewriting provides no benefit. *(#2)*
 
 ### Dead code
 
 - [x] **P0-08** — Confirm which `model.pkl` is live. `backend/recommender_app/utils.py` resolves `PROJECT_ROOT/ML-model/model.pkl`, so the copy under `recommender_app/` is dead. *(#7)*
   Verified this session. Deletion is P0-09.
 
-- [ ] **P0-09** — `git rm backend/recommender_app/model.pkl` — 4.5MB of dead binary. *(#7, 2 min)*
-  **Done when:** gone from `git ls-files`, and `python manage.py runserver` + one recommendation request still works.
+- [x] **P0-09** — `git rm backend/recommender_app/model.pkl` — 4.5MB dead binary removed. *(#7)*
 
-- [ ] **P0-10** — `git rm backend/recommender_app/tmdb_utils.py` — DRF-style helper that `urls.py` never routes to. *(5 min)*
-  **Done when:** gone, and `grep -r tmdb_utils backend/` returns nothing.
+- [x] **P0-10** — `git rm backend/recommender_app/tmdb_utils.py` — removed. *(#)*
 
-- [ ] **P0-11** — `git rm frontend/app/api/tmdb.js` — never imported; posters come from the backend. Depends on `NEXT_PUBLIC_TMDB_*` vars that have no `.env.local` in the repo, so it would crash if ever called. *(#37, 5 min)*
-  **Done when:** gone, `npm run build` passes, `grep -r "api/tmdb" frontend/` returns nothing.
+- [x] **P0-11** — `git rm frontend/app/api/tmdb.js` — removed. *(#37)*
 
-- [ ] **P0-12** — `git rm ML-model/notebooks/model_buillding.ipynb` — 3 cells, all commented out, nothing executable, while the README advertises "Jupyter notebooks for experiments". *(#13, 5 min)*
-  **Done when:** gone, and the README no longer claims notebooks exist (folded into P4-01).
+- [x] **P0-12** — `git rm ML-model/notebooks/model_buillding.ipynb` — removed. *(#13)*
 
-- [ ] **P0-13** — `git rm package.json` + root `node_modules`. The only dependency is `axios`, which belongs to the frontend and is already in `frontend/package.json`. *(#4, 10 min)*
-  **Done when:** no `package.json` at repo root; `cd frontend && npm install && npm run build` still works.
+- [x] **P0-13** — `git rm package.json` at repo root. `node_modules/` was already untracked (gitignore fix in P0-04). *(#4)*
 
 ### Housekeeping
 
-- [ ] **P0-14** — Add `LICENSE` (MIT, to match the README's existing claim). *(#8, 5 min)*
-  **Done when:** `LICENSE` exists at root with your name and 2026.
+- [x] **P0-14** — Added `LICENSE` (MIT, 2026, Abdelillah Ouraou). *(#8)*
 
-- [ ] **P0-15** — Rename `ML-model/notebooks/model_buillding.py` → `build_model.py`, using `git mv` so history follows. *(5 min)*
-  **Done when:** renamed, and the README/CLAUDE.md references updated. Note CLAUDE.md currently documents the typo as intentional — that line needs changing too.
+- [x] **P0-15** — `git mv ML-model/notebooks/model_buillding.py` → `build_model.py`. CLAUDE.md updated to reference `build_model.py`. *(#)*
 
-- [ ] **P0-16** — Refresh `CLAUDE.md`. Two of its documented gotchas are now stale: the hardcoded-TMDB-key duplication (fixed in `c0aef92`) and the `model_buillding.py` filename (P0-15). *(15 min)*
-  **Done when:** every gotcha in `CLAUDE.md` is verifiable against the current tree.
+- [x] **P0-16** — Refreshed `CLAUDE.md`: removed stale TMDB-key-duplication and tmdb_utils.py gotchas; fixed model build command; removed stale requirements.txt note; added `overview` gap gotcha (P2-07). *(#)*
 
 > **Phase 0 done when:** `git clone` yields no secrets, no vendored dependencies, no personal notes, and no dead files.
 

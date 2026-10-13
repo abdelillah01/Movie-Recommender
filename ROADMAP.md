@@ -6,6 +6,8 @@
 
 **Current size:** ~600 LOC Python, ~380 LOC JS/JSX, 4,635 movies, 18 commits.
 
+**Git history decision (P0-07):** The TMDB API key and Django `SECRET_KEY` are in public git history and cannot be fully erased without a force-push rewrite. Decision: leave history intact. The old TMDB key has been rotated (P0-01) and is revoked; the Django key is a dev-only insecure default. Force-rewriting published history provides no security benefit for already-revoked credentials and risks confusing collaborators. A reviewer who finds the old key in history can see from the surrounding commits that it was handled deliberately, not missed.
+
 ---
 
 ## 1. Honest assessment of where it stands
