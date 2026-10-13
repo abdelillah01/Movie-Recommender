@@ -127,7 +127,7 @@ print("✅ Ratings merged. Shape after ratings:", final.shape)
 # --------------------------------------
 # 1️⃣3️⃣ Keep only useful columns
 # --------------------------------------
-final = final[['movieId', 'title', 'genres','rating', 'overview', 'cast', 'crew', 'keywords', 'combined' ]]
+final = final[['movieId', 'id', 'title', 'genres', 'release_date', 'vote_average', 'rating', 'overview', 'cast', 'crew', 'keywords', 'combined']]
 
 # --------------------------------------
 # 1️⃣4️⃣ Save cleaned dataset

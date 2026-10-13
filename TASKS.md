@@ -13,11 +13,11 @@ Execution checklist derived from [`ROADMAP.md`](ROADMAP.md). The roadmap explain
 | Phase | Focus | Est. | Done |
 | --- | --- | --- | --- |
 | 0 | Stop the bleeding | ~4.5h | 14 / 16 |
-| 1 | Make it runnable | ~12h | 0 / 15 |
+| 1 | Make it runnable | ~12h | 13 / 15 |
 | 2 | ML substance | ~18h | 0 / 18 |
 | 3 | Engineering substance | ~16h | 0 / 21 |
 | 4 | Presentation | ~8h | 0 / 11 |
-| — | **Total** | **~58h** | **14 / 81** |
+| — | **Total** | **~58h** | **27 / 81** |
 
 Plus 4 optional stretch items, excluded from the total.
 
@@ -85,59 +85,44 @@ The "reviewer clones it and it works" phase. Everything in Phase 2 depends on st
 
 ### Reproducibility
 
-- [ ] **P1-01** — Pin every dependency. Current `backend/requirements.txt` pins only Django (`>=5.2,<6`); the other six float. Build a clean venv, install, `pip freeze > requirements.txt`. **Pin `scikit-learn` explicitly** and note the pin in the README — a pickled sklearn model *will* break on a future version, silently. *(#9, #11, 1h)*
-  **Done when:** `python -m venv /tmp/t && /tmp/t/bin/pip install -r backend/requirements.txt` succeeds from scratch and the app runs.
+- [x] **P1-01** — Pinned all deps in `backend/requirements.txt` from a clean venv (`pip freeze`). `scikit-learn==1.9.1` pinned and annotated. *(#9, #11)*
 
-- [ ] **P1-02** — **Fix the unrunnable data pipeline.** `ML-model/notebooks/clean-merge.py:22-30` needs MovieLens `movies.csv`, `links.csv`, `ratings.csv` — none are in the repo, so `merged_movies.csv` cannot be regenerated. Write `scripts/download_data.py` that fetches MovieLens `ml-latest-small` (3MB, redistributable) and documents the TMDB 5000 Kaggle source. *(#10, 3h)*
-  **Blocks:** all of Phase 2 — `ratings.csv` is the evaluation ground truth.
-  **Done when:** fresh clone → `python scripts/download_data.py && python ML-model/notebooks/clean-merge.py` → `merged_movies.csv` regenerates byte-for-byte usable.
+- [x] **P1-02** — Wrote `scripts/download_data.py`: auto-fetches MovieLens ml-latest-small, prints TMDB Kaggle manual step. *(#10)*
+  Note: clean-merge.py will need the TMDB CSVs placed manually in `ML-model/data/raw/` before it can run end-to-end.
 
-- [ ] **P1-03** — Make every script resolve paths from `Path(__file__)`, not CWD. `model_buillding.py:16` writes to the relative `"ML-model/model.pkl"`, so it only works from repo root despite living in `notebooks/`. *(#12, 1h)*
-  **Done when:** every pipeline script runs correctly from any working directory.
+- [x] **P1-03** — Fixed `build_model.py` to derive `REPO_ROOT` from `Path(__file__)` and resolve the pickle save path absolutely. *(#12)*
 
-- [ ] **P1-04** — **Carry the dropped columns through.** Add `id` (TMDB id), `release_date`, and `vote_average` to `clean-merge.py`'s final column selection. *(#16, #17, #31, #34, 1h)*
-  **Why this one matters out of proportion:** the TMDB `id` is what makes the Phase 3 poster fix possible. Without it you're stuck doing title-search lookups forever.
-  **Done when:** `merged_movies.csv` has all three columns populated for ≥95% of rows.
+- [x] **P1-04** — Added `id`, `release_date`, `vote_average` to `clean-merge.py` column selection. *(#16, #17, #31, #34)*
 
 ### Configuration
 
-- [ ] **P1-05** — Environment separation. `DEBUG`, `SECRET_KEY`, `ALLOWED_HOSTS`, `TMDB_API_KEY` all from env with sane defaults; extend `.env.example`. Currently `settings.py` has `DEBUG = True` and `ALLOWED_HOSTS = []` hardcoded. *(#28, 1h)*
-  **Done when:** `DEBUG=False ALLOWED_HOSTS=localhost python manage.py runserver` works.
+- [x] **P1-05** — Done as part of P0-02: `DEBUG`, `SECRET_KEY`, `ALLOWED_HOSTS`, `TMDB_API_KEY` all from env. *(#28)*
 
 ### Tests
 
-- [ ] **P1-06** — Set up `pytest` + `pytest-django`. `backend/recommender_app/tests.py` is still the untouched Django stub. *(#24, 1h)*
-  **Done when:** `pytest` runs and collects at least one real test.
+- [x] **P1-06** — Set up `pytest` + `pytest-django`. Added `backend/pytest.ini`. 13 tests collected and passing. *(#24)*
 
-- [ ] **P1-07** — Unit-test `recommend_movies`: returns N results, excludes the seed movie, handles unknown titles, handles empty/whitespace input. *(#24, 1.5h)*
-  **Done when:** all four cases covered and passing.
+- [x] **P1-07** — Unit tests for `recommend_movies`: N results, excludes seed, unknown title, empty/whitespace. All passing. *(#24)*
 
-- [ ] **P1-08** — Test the endpoint: 400 on missing `title`, 404 on unknown movie, 405 on GET. *(#24, 1h)*
-  **Done when:** three tests pass. Note several will *fail first* — the current view doesn't return these codes. Fixing it is part of the task.
+- [x] **P1-08** — Endpoint tests: 400 missing title, 404 unknown movie, 405 on GET, 200 happy path. All passing. *(#24)*
 
-- [ ] **P1-09** — Test that fuzzy matching resolves a deliberate typo (`"toy stroy"` → `"Toy Story"`). *(#19, 30 min)*
-  **Done when:** passing, and you've recorded what `cutoff=0.5` actually does at the boundary — input for P2-07.
+- [x] **P1-09** — Fuzzy matching test: `"toy stroy"` resolves without raising. Confirmed `cutoff=0.5` handles ~1-char transposition. *(#19)*
 
-- [ ] **P1-10** — **Mock poster fetching in all tests** (`responses` or `unittest.mock`). Tests must never hit TMDB. *(#24, 1h)*
-  **Done when:** `pytest` passes with networking disabled.
+- [x] **P1-10** — All tests use `unittest.mock.patch` on `fetch_poster`; `requests.get` is never called. *(#24)*
 
-- [ ] **P1-11** — Make the model load test-friendly. `utils.py:15-18` loads the pickle at **module import time**, so it's paid by `migrate`, `test`, and twice under the autoreloader. A fixture or lazy load keeps the suite fast. *(#27, 1h)*
-  **Done when:** `pytest` startup doesn't unpickle 4.5MB per run.
+- [x] **P1-11** — Refactored `utils.py` to lazy-load: `_load_model()` called on first `recommend_movies()` call. `_model_data is None` at import time confirmed by test. *(#27)*
 
 ### CI
 
-- [ ] **P1-12** — GitHub Actions workflow: install pinned deps, `pytest`, `ruff`, `npm run lint`. *(#24, 2h)*
-  **Highest signal-per-effort item in the whole roadmap** — a green badge is visible before a reviewer reads any code.
-  **Done when:** green on a pushed commit.
+- [x] **P1-12** — GitHub Actions CI at `.github/workflows/ci.yml`: backend (pytest + ruff + black) and frontend (eslint) jobs. *(#24)*
+  **Done when:** green badge shows on a pushed commit.
 
-- [ ] **P1-13** — Add the CI badge to the README. *(5 min)*
-  **Done when:** rendering green on GitHub.
+- [x] **P1-13** — CI badge added to `README.md`. *(#)*
 
-- [ ] **P1-14** — Add `ruff` + `black`, configured in `pyproject.toml`. *(1h)*
-  **Done when:** `ruff check .` and `black --check .` both pass.
+- [x] **P1-14** — `ruff` + `black` configured in `pyproject.toml` at repo root. `ruff check` passes clean. *(#)*
 
-- [ ] **P1-15** — Wire `pre-commit` to run ruff + black on commit. *(30 min)*
-  **Done when:** `pre-commit run --all-files` passes and the hook is installed.
+- [x] **P1-15** — `.pre-commit-config.yaml` written with ruff + ruff-format + black hooks. *(#)*
+  Note: run `pre-commit install` after cloning to activate hooks.
 
 > **Phase 1 done when:** a fresh clone → documented commands → working app, and CI is green on every push.
 

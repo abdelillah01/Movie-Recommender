@@ -11,16 +11,13 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 
-from dotenv import load_dotenv
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 load_dotenv()
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
-
-
-
-
-from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

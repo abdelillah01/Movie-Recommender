@@ -1,7 +1,10 @@
+import json
+
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-import json
+
 from .utils import recommend_movies
+
 
 @csrf_exempt
 def recommend_view(request):

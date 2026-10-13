@@ -1,5 +1,7 @@
 # Movie Recommender System
 
+[![CI](https://github.com/abdelillah01/Movie-Recommender/actions/workflows/ci.yml/badge.svg)](https://github.com/abdelillah01/Movie-Recommender/actions/workflows/ci.yml)
+
 A content-based movie recommendation system built with Python, scikit-learn, Django REST Framework, and Next.js.
 It recommends similar movies based on the textual similarity of metadata like genres, keywords, cast, and descriptions.
 
