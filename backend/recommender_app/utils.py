@@ -3,6 +3,7 @@ import re
 from difflib import get_close_matches
 from pathlib import Path
 
+import numpy as np
 import requests
 from django.conf import settings
 from sklearn.metrics.pairwise import cosine_similarity
@@ -51,7 +52,10 @@ def fetch_poster(title: str):
     return None
 
 
-def recommend_movies(movie_title, top_n=10):
+RERANK_BETA = 0.3  # exponent for vote_average in score = sim * rating^β
+
+
+def recommend_movies(movie_title, top_n=10, rerank=True):
     (tfidf_vectorizer, tfidf_matrix, movies_df), title_to_index = _load_model()
 
     query_lower = movie_title.lower()
@@ -64,7 +68,16 @@ def recommend_movies(movie_title, top_n=10):
     matched_title = movies_df.iloc[idx]["title"]
 
     cosine_similarities = cosine_similarity(tfidf_matrix[idx], tfidf_matrix).flatten()
-    similar_indices = cosine_similarities.argsort()[-top_n - 1:-1][::-1]
+
+    if rerank and "vote_average" in movies_df.columns:
+        ratings = movies_df["vote_average"].fillna(0).to_numpy().astype(float)
+        scores = cosine_similarities * np.power(np.maximum(ratings, 0), RERANK_BETA)
+    else:
+        scores = cosine_similarities
+
+    # exclude the seed movie itself
+    scores[idx] = -1
+    similar_indices = scores.argsort()[-top_n:][::-1]
     similar_titles = movies_df.iloc[similar_indices]["title"].tolist()
 
     recommendations = [
