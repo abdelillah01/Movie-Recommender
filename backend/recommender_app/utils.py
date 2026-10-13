@@ -1,3 +1,4 @@
+import json
 import pickle
 import re
 from difflib import get_close_matches
@@ -5,12 +6,14 @@ from pathlib import Path
 
 import numpy as np
 import requests
+import sklearn
 from django.conf import settings
 from sklearn.metrics.pairwise import cosine_similarity
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = BASE_DIR.parent
 MODEL_PATH = PROJECT_ROOT / "ML-model" / "model.pkl"
+MODEL_V2_DIR = PROJECT_ROOT / "ML-model" / "model_v2"
 NEIGHBOR_TABLE_PATH = PROJECT_ROOT / "ML-model" / "neighbor_table.npy"
 
 _model_data = None
@@ -21,8 +24,22 @@ _neighbor_table = None  # shape (n_movies, 50) int32, None if file absent
 def _load_model():
     global _model_data, _title_to_index, _neighbor_table
     if _model_data is None:
-        with open(MODEL_PATH, "rb") as f:
-            _model_data = pickle.load(f)
+        meta_path = MODEL_V2_DIR / "model_meta.json"
+        if MODEL_V2_DIR.exists() and meta_path.exists():
+            meta = json.loads(meta_path.read_text())
+            saved_ver = tuple(int(x) for x in meta["sklearn_version"].split(".")[:2])
+            current_ver = tuple(int(x) for x in sklearn.__version__.split(".")[:2])
+            if saved_ver == current_ver:
+                import joblib
+                import pandas as pd
+                import scipy.sparse
+                tfidf = joblib.load(MODEL_V2_DIR / "vectorizer.joblib")
+                matrix = scipy.sparse.load_npz(str(MODEL_V2_DIR / "tfidf_matrix.npz"))
+                df = pd.read_csv(MODEL_V2_DIR / "movies.csv")
+                _model_data = (tfidf, matrix, df)
+        if _model_data is None:
+            with open(MODEL_PATH, "rb") as f:
+                _model_data = pickle.load(f)
         _, _, movies_df = _model_data
         _title_to_index = {title.lower(): i for i, title in enumerate(movies_df["title"])}
         if NEIGHBOR_TABLE_PATH.exists():
