@@ -1,4 +1,3 @@
-// components/BackgroundFX.jsx
 "use client";
 
 export default function BackgroundFX() {

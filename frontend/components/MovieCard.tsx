@@ -2,7 +2,19 @@
 
 import { motion } from "framer-motion";
 
-function parseTitle(raw) {
+interface MovieCardProps {
+  title: string;
+  poster: string | null;
+  vote_average?: number | null;
+  release_date?: string | null;
+}
+
+interface ParsedTitle {
+  title: string;
+  year: string | null;
+}
+
+function parseTitle(raw: string | undefined): ParsedTitle {
   const m = raw?.match(/^(.*?)\s*\((\d{4})\)\s*$/);
   return m ? { title: m[1].trim(), year: m[2] } : { title: raw || "", year: null };
 }
@@ -32,7 +44,7 @@ function FilmIcon() {
   );
 }
 
-export default function MovieCard({ title: rawTitle, poster, vote_average, release_date }) {
+export default function MovieCard({ title: rawTitle, poster, vote_average, release_date }: MovieCardProps) {
   const { title, year: parsedYear } = parseTitle(rawTitle);
   const year = parsedYear || (release_date ? release_date.slice(0, 4) : null);
   const rating = vote_average != null ? Number(vote_average).toFixed(1) : null;
@@ -45,6 +57,7 @@ export default function MovieCard({ title: rawTitle, poster, vote_average, relea
     >
       {poster ? (
         <div className="relative">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={poster}
             alt={title}
@@ -57,9 +70,7 @@ export default function MovieCard({ title: rawTitle, poster, vote_average, relea
             </h3>
             <div className="flex items-center gap-2 mt-1">
               {year && <span className="text-xs text-slate-400">{year}</span>}
-              {rating && (
-                <span className="text-xs text-amber-400/80">★ {rating}</span>
-              )}
+              {rating && <span className="text-xs text-amber-400/80">★ {rating}</span>}
             </div>
           </div>
         </div>

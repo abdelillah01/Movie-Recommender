@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 
+interface SearchBarProps {
+  onSearch: (title: string) => void;
+}
+
 function SearchIcon() {
   return (
     <svg
@@ -36,10 +40,10 @@ function ClearIcon() {
   );
 }
 
-export default function SearchBar({ onSearch }) {
+export default function SearchBar({ onSearch }: SearchBarProps) {
   const [title, setTitle] = useState("");
 
-  const submit = (e) => {
+  const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
     onSearch(title.trim());
