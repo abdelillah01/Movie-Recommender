@@ -2,7 +2,19 @@
 
 import { motion } from "framer-motion";
 
-function parseTitle(raw) {
+interface MovieCardProps {
+  title: string;
+  poster: string | null;
+  vote_average?: number | null;
+  release_date?: string | null;
+}
+
+interface ParsedTitle {
+  title: string;
+  year: string | null;
+}
+
+function parseTitle(raw: string | undefined): ParsedTitle {
   const m = raw?.match(/^(.*?)\s*\((\d{4})\)\s*$/);
   return m ? { title: m[1].trim(), year: m[2] } : { title: raw || "", year: null };
 }
@@ -32,8 +44,10 @@ function FilmIcon() {
   );
 }
 
-export default function MovieCard({ title: rawTitle, poster }) {
-  const { title, year } = parseTitle(rawTitle);
+export default function MovieCard({ title: rawTitle, poster, vote_average, release_date }: MovieCardProps) {
+  const { title, year: parsedYear } = parseTitle(rawTitle);
+  const year = parsedYear || (release_date ? release_date.slice(0, 4) : null);
+  const rating = vote_average != null ? Number(vote_average).toFixed(1) : null;
 
   return (
     <motion.article
@@ -43,6 +57,7 @@ export default function MovieCard({ title: rawTitle, poster }) {
     >
       {poster ? (
         <div className="relative">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={poster}
             alt={title}
@@ -53,7 +68,10 @@ export default function MovieCard({ title: rawTitle, poster }) {
             <h3 className="font-semibold text-sm leading-snug text-white drop-shadow line-clamp-2">
               {title}
             </h3>
-            {year && <p className="mt-1 text-xs text-slate-400">{year}</p>}
+            <div className="flex items-center gap-2 mt-1">
+              {year && <span className="text-xs text-slate-400">{year}</span>}
+              {rating && <span className="text-xs text-amber-400/80">★ {rating}</span>}
+            </div>
           </div>
         </div>
       ) : (
@@ -61,7 +79,10 @@ export default function MovieCard({ title: rawTitle, poster }) {
           <FilmIcon />
           <div className="px-4 text-center">
             <p className="text-xs font-medium text-slate-400 line-clamp-2">{title}</p>
-            {year && <p className="mt-1 text-xs text-slate-600">{year}</p>}
+            <div className="flex items-center justify-center gap-2 mt-1">
+              {year && <span className="text-xs text-slate-600">{year}</span>}
+              {rating && <span className="text-xs text-amber-500/60">★ {rating}</span>}
+            </div>
           </div>
         </div>
       )}

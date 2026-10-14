@@ -1,41 +1,41 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import SearchBar from "../components/SearchBar";
 import MovieCard from "../components/MovieCard";
 import LoadingSkeleton from "../components/LoadingSkeleton";
-import recommendMovies from "./api/recommend";
 import BackgroundFX from "../components/BackgroundFX";
+import recommendMovies, { type Movie } from "../lib/api";
 
 const FEATURED = [
   "Inception", "The Dark Knight", "Toy Story", "Interstellar",
   "Pulp Fiction", "The Matrix", "Forrest Gump", "Parasite",
 ];
 
-const fadeIn = {
+const fadeIn: Variants = {
   hidden: { opacity: 0, y: 10 },
   show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
 };
 
-const gridVariants = {
+const gridVariants: Variants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.06 } },
 };
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 20, scale: 0.97 },
   show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3, ease: "easeOut" } },
 };
 
 export default function Home() {
-  const [movies, setMovies] = useState([]);
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
-  const [matched, setMatched] = useState(null);
+  const [matched, setMatched] = useState<string | null>(null);
 
-  const handleSearch = async (title) => {
+  const handleSearch = async (title: string) => {
     setError("");
     setMovies([]);
     setQuery(title);
@@ -45,11 +45,7 @@ export default function Home() {
     try {
       const { matched: m, recommendations } = await recommendMovies(title);
       setMatched(m);
-      const normalized = recommendations.map((r) => ({
-        title: r.title || String(r),
-        poster: r.poster || "",
-      }));
-      setMovies(normalized);
+      setMovies(recommendations);
     } catch (err) {
       console.error("Search failed:", err);
       setError("Could not fetch recommendations. Is the backend running?");
@@ -146,9 +142,14 @@ export default function Home() {
             animate="show"
             className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
           >
-            {movies.map((m, idx) => (
-              <motion.div key={idx} variants={cardVariants}>
-                <MovieCard title={m.title} poster={m.poster} />
+            {movies.map((m) => (
+              <motion.div key={m.tmdb_id ?? m.title} variants={cardVariants}>
+                <MovieCard
+                  title={m.title}
+                  poster={m.poster}
+                  vote_average={m.vote_average}
+                  release_date={m.release_date}
+                />
               </motion.div>
             ))}
           </motion.div>

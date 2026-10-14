@@ -40,6 +40,7 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",") if os.getenv("ALLOWED_
 INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
+    "drf_spectacular",
     "django.contrib.staticfiles",
     'django.contrib.admin',
     'django.contrib.auth',
@@ -48,6 +49,26 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     "recommender_app",
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/min",
+    },
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Movie Recommender API",
+    "DESCRIPTION": (
+        "Content-based movie recommender: TF-IDF cosine similarity over "
+        "genres, keywords, cast and crew."
+    ),
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",  # must be first
