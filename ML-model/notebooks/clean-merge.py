@@ -3,10 +3,12 @@
 # ======================================
 
 # 📦 Imports
-import pandas as pd
-import numpy as np
+import re
 import ast
 from pathlib import Path
+
+import numpy as np
+import pandas as pd
 
 # --------------------------------------
 # 1️⃣ Define Base Paths (robust and portable)
@@ -105,7 +107,11 @@ final.rename(columns={'genres_x': 'genres'}, inplace=True)
 # 🔟 Combine all text features
 # --------------------------------------
 def combine_features(row):
-    return " ".join(row['genres'] + row['keywords'] + row['cast'] + row['crew'])
+    tokens = row['genres'] + row['keywords'] + row['cast'] + row['crew']
+    if pd.notna(row.get('overview')):
+        overview_clean = re.sub(r'[^a-z0-9 ]', '', str(row['overview']).lower())
+        tokens = tokens + overview_clean.split()
+    return " ".join(tokens)
 
 final['combined'] = final.apply(combine_features, axis=1)
 
@@ -127,7 +133,7 @@ print("✅ Ratings merged. Shape after ratings:", final.shape)
 # --------------------------------------
 # 1️⃣3️⃣ Keep only useful columns
 # --------------------------------------
-final = final[['movieId', 'title', 'genres','rating', 'overview', 'cast', 'crew', 'keywords', 'combined' ]]
+final = final[['movieId', 'id', 'title', 'genres', 'release_date', 'vote_average', 'rating', 'overview', 'cast', 'crew', 'keywords', 'combined']]
 
 # --------------------------------------
 # 1️⃣4️⃣ Save cleaned dataset

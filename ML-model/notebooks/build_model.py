@@ -1,19 +1,25 @@
-import sys, os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+import sys
+from pathlib import Path
+
+NOTEBOOKS_DIR = Path(__file__).resolve().parent
+ML_MODEL_DIR = NOTEBOOKS_DIR.parent
+REPO_ROOT = ML_MODEL_DIR.parent
+
+sys.path.append(str(ML_MODEL_DIR))
 
 from recommender.data_loader import load_clean_data
-from recommender.model_builder import build_tfidf_model, save_model
+from recommender.model_builder import build_tfidf_model, save_model, save_model_v2
 from recommender.recommender import recommend
 
 # 1️⃣ Load data
 df = load_clean_data()
-# print(df["title"].head(20))
 
 # 2️⃣ Build TF-IDF model
 tfidf, matrix = build_tfidf_model(df)
 
-# 3️⃣ Save model for Django use later
-save_model((tfidf, matrix, df), "ML-model/model.pkl")
+# 3️⃣ Save legacy pickle (backward compat) + v2 separate artifacts
+save_model((tfidf, matrix, df), str(REPO_ROOT / "ML-model" / "model.pkl"))
+save_model_v2(tfidf, matrix, df, str(REPO_ROOT / "ML-model" / "model_v2"))
 
 # 4️⃣ Test recommendation
  # sample_title = "The Dark Knight"

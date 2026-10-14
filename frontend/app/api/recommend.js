@@ -17,16 +17,16 @@ export default async function recommendMovies(title) {
     }
 
     const data = await response.json();
-    console.log("Backend response:", data);
 
-    // Ensure valid shape
-    if (Array.isArray(data.recommendations)) {
-      return data.recommendations;
-    } else if (data.recommendations && typeof data.recommendations === "object") {
-      return Object.values(data.recommendations);
-    } else {
-      throw new Error("Invalid data format from backend");
-    }
+    const recs = Array.isArray(data.recommendations)
+      ? data.recommendations
+      : data.recommendations && typeof data.recommendations === "object"
+        ? Object.values(data.recommendations)
+        : null;
+
+    if (!recs) throw new Error("Invalid data format from backend");
+
+    return { matched: data.matched || null, recommendations: recs };
   } catch (err) {
     console.error("Fetch failed:", err);
     throw err;
