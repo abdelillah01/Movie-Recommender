@@ -32,8 +32,10 @@ function FilmIcon() {
   );
 }
 
-export default function MovieCard({ title: rawTitle, poster }) {
-  const { title, year } = parseTitle(rawTitle);
+export default function MovieCard({ title: rawTitle, poster, vote_average, release_date }) {
+  const { title, year: parsedYear } = parseTitle(rawTitle);
+  const year = parsedYear || (release_date ? release_date.slice(0, 4) : null);
+  const rating = vote_average != null ? Number(vote_average).toFixed(1) : null;
 
   return (
     <motion.article
@@ -53,7 +55,12 @@ export default function MovieCard({ title: rawTitle, poster }) {
             <h3 className="font-semibold text-sm leading-snug text-white drop-shadow line-clamp-2">
               {title}
             </h3>
-            {year && <p className="mt-1 text-xs text-slate-400">{year}</p>}
+            <div className="flex items-center gap-2 mt-1">
+              {year && <span className="text-xs text-slate-400">{year}</span>}
+              {rating && (
+                <span className="text-xs text-amber-400/80">★ {rating}</span>
+              )}
+            </div>
           </div>
         </div>
       ) : (
@@ -61,7 +68,10 @@ export default function MovieCard({ title: rawTitle, poster }) {
           <FilmIcon />
           <div className="px-4 text-center">
             <p className="text-xs font-medium text-slate-400 line-clamp-2">{title}</p>
-            {year && <p className="mt-1 text-xs text-slate-600">{year}</p>}
+            <div className="flex items-center justify-center gap-2 mt-1">
+              {year && <span className="text-xs text-slate-600">{year}</span>}
+              {rating && <span className="text-xs text-amber-500/60">★ {rating}</span>}
+            </div>
           </div>
         </div>
       )}

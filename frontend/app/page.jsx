@@ -48,6 +48,9 @@ export default function Home() {
       const normalized = recommendations.map((r) => ({
         title: r.title || String(r),
         poster: r.poster || "",
+        vote_average: r.vote_average ?? null,
+        release_date: r.release_date ?? null,
+        tmdb_id: r.tmdb_id ?? null,
       }));
       setMovies(normalized);
     } catch (err) {
@@ -146,9 +149,14 @@ export default function Home() {
             animate="show"
             className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
           >
-            {movies.map((m, idx) => (
-              <motion.div key={idx} variants={cardVariants}>
-                <MovieCard title={m.title} poster={m.poster} />
+            {movies.map((m) => (
+              <motion.div key={m.tmdb_id ?? m.title} variants={cardVariants}>
+                <MovieCard
+                  title={m.title}
+                  poster={m.poster}
+                  vote_average={m.vote_average}
+                  release_date={m.release_date}
+                />
               </motion.div>
             ))}
           </motion.div>

@@ -30,8 +30,8 @@
   }
 }
 
-/* Motion and transitions (do not globally transition transform) */
-* {
+/* Opt-in transition helpers — applied per-component, not globally */
+.transition-ui {
   transition:
     color 200ms ease,
     background-color 200ms ease,

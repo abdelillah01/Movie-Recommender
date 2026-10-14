@@ -2,7 +2,8 @@ export default async function recommendMovies(title) {
   if (!title) return [];
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/api/recommend/", {
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+    const response = await fetch(`${apiBase}/api/recommend/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -17,7 +18,6 @@ export default async function recommendMovies(title) {
     }
 
     const data = await response.json();
-
     const recs = Array.isArray(data.recommendations)
       ? data.recommendations
       : data.recommendations && typeof data.recommendations === "object"
