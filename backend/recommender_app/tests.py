@@ -56,7 +56,7 @@ class RecommendMoviesTest(TestCase):
             "recommender_app.utils._load_model",
             return_value=(FAKE_MODEL, {t.lower(): i for i, t in enumerate(FAKE_MODEL[2]["title"])}),
         )
-        patcher_poster = patch("recommender_app.utils.fetch_poster", return_value=None)
+        patcher_poster = patch("recommender_app.utils.get_poster", return_value=None)
         self.mock_model = patcher_model.start()
         self.mock_poster = patcher_poster.start()
         self.addCleanup(patcher_model.stop)
@@ -110,7 +110,7 @@ class FuzzyMatchTest(TestCase):
             "recommender_app.utils._load_model",
             return_value=(FAKE_MODEL, {t.lower(): i for i, t in enumerate(FAKE_MODEL[2]["title"])}),
         )
-        patcher_poster = patch("recommender_app.utils.fetch_poster", return_value=None)
+        patcher_poster = patch("recommender_app.utils.get_poster", return_value=None)
         self.mock_model = patcher_model.start()
         self.mock_poster = patcher_poster.start()
         self.addCleanup(patcher_model.stop)
@@ -173,12 +173,18 @@ class RecommendViewTest(TestCase):
 # P1-10: fetch_poster never hits TMDB during the test suite
 # ---------------------------------------------------------------------------
 
-class PosterMockTest(TestCase):
-    def test_poster_mock_prevents_network(self):
-        with patch("requests.get") as mock_get:
-            mock_get.side_effect = AssertionError("network must not be called in tests")
-            with patch("recommender_app.utils.fetch_poster", return_value="http://example.com/poster.jpg"):
-                from recommender_app.utils import fetch_poster
-                result = fetch_poster("Toy Story")
-                self.assertEqual(result, "http://example.com/poster.jpg")
+class PosterCacheTest(TestCase):
+    def test_get_poster_uses_cache_no_network(self):
+        """get_poster() must return from _poster_cache without any HTTP call."""
+        import recommender_app.utils as utils
+        original = utils._poster_cache.copy()
+        try:
+            utils._poster_cache[862] = "http://example.com/poster.jpg"
+            with patch("requests.get") as mock_get:
+                mock_get.side_effect = AssertionError("network must not be called")
+                result = utils.get_poster(862)
+            self.assertEqual(result, "http://example.com/poster.jpg")
             mock_get.assert_not_called()
+        finally:
+            utils._poster_cache.clear()
+            utils._poster_cache.update(original)
